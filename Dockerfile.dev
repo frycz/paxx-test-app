@@ -1,0 +1,25 @@
+# Development Dockerfile for paxx-test-app
+# Optimized for hot-reload and fast iteration
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install uv for fast dependency management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Install dependencies first (cached layer)
+# --no-dev excludes dev dependencies (which may have local path references)
+COPY pyproject.toml uv.lock* ./
+RUN uv sync --frozen --no-dev --no-install-project 2>/dev/null || uv sync --no-dev --no-install-project
+
+# Copy source code (mounted as volume in dev, but needed for initial build)
+COPY . .
+
+# Sync again to install the project itself
+RUN uv sync --frozen --no-dev 2>/dev/null || uv sync --no-dev
+
+EXPOSE 8000
+
+# Run with hot-reload enabled
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
