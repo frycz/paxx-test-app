@@ -1,0 +1,56 @@
+# Docker Compose for paxx-test-app - Linux Server Deployment
+# Infrastructure stack: Traefik + PostgreSQL
+#
+# Usage:
+#   docker compose up -d traefik db   # Start infrastructure
+#   docker compose logs -f            # Follow logs
+#   docker compose down               # Stop all services
+#
+# Note: App containers are managed by deploy.sh (blue-green deployment),
+#       not by this compose file.
+
+
+services:
+  traefik:
+    image: traefik:v3.0
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik-public"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=false"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - traefik-public
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=paxx_test_app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - internal
+
+networks:
+  traefik-public:
+    external: true
+  internal:
+    driver: bridge
+
+volumes:
+  postgres_data:
+

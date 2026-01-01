@@ -22,6 +22,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Install curl for health checks
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy only the virtual environment and application code
 COPY --from=builder /app/.venv /app/.venv
 COPY --from=builder /app .
@@ -29,5 +33,8 @@ COPY --from=builder /app .
 ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--workers", "4"]
