@@ -27,6 +27,19 @@ uv sync --all-extras
 uv run paxx start
 ```
 
+### Option 3: Local Development with External Database
+
+```bash
+# Install dependencies
+uv sync --all-extras
+
+# Set your database URL in settings.py or via environment variable
+export DATABASE_URL="postgresql://user:password@host:5432/dbname"
+
+# Run the development server
+uv run paxx start
+```
+
 ### Database Migrations
 
 ```bash

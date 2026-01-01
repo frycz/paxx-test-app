@@ -1,0 +1,51 @@
+# GitHub Actions: Build and Push Docker Image
+#
+# This workflow builds and pushes your app to GitHub Container Registry (GHCR)
+# when you create a git tag (e.g., v1.0.0).
+#
+# TO ACTIVATE:
+#   mkdir -p .github/workflows && cp deploy/build.yml.example .github/workflows/build.yml
+#
+# USAGE:
+#   git tag v1.0.0
+#   git push origin v1.0.0
+#   # Image will be available at: ghcr.io/<your-username>/paxx-test-app:v1.0.0
+#
+# REQUIREMENTS:
+#   - Repository must be on GitHub
+#   - For private repos: enable GHCR access in repository settings
+
+
+name: Build and Push
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on v1.0.0, v2.1.3, etc.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write  # Needed for GHCR
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}:latest
+
