@@ -12,19 +12,24 @@
 
 services:
   traefik:
-    image: traefik:v3.0
+    image: traefik:latest
     restart: unless-stopped
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-public"
+      - "--providers.file.directory=/etc/traefik/dynamic"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
       - "--api.dashboard=false"
       - "--log.level=INFO"
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/traefik/certs:ro
+      - ./traefik-dynamic.yml:/etc/traefik/dynamic/traefik-dynamic.yml:ro
     networks:
       - traefik-public
 
@@ -43,13 +48,13 @@ services:
       timeout: 3s
       retries: 5
     networks:
-      - internal
+      - backend
 
 networks:
   traefik-public:
     external: true
-  internal:
-    driver: bridge
+  backend:
+    external: true
 
 volumes:
   postgres_data:

@@ -115,12 +115,19 @@ if [ "$SUDO_USER" != "root" ]; then
     chown "$SUDO_USER:$SUDO_USER" "$APP_DIR"
 fi
 
-# 8. Create Docker network for Traefik (if not exists)
+# 8. Create Docker networks (if not exist)
 if docker network ls | grep -q traefik-public; then
     log_info "Docker network 'traefik-public' already exists"
 else
     log_info "Creating Docker network 'traefik-public'..."
     docker network create traefik-public
+fi
+
+if docker network ls | grep -q backend; then
+    log_info "Docker network 'backend' already exists"
+else
+    log_info "Creating Docker network 'backend'..."
+    docker network create backend
 fi
 
 # 9. Create log directory for deploy scripts

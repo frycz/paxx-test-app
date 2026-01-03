@@ -29,8 +29,7 @@ if [ ${#WARNINGS[@]} -gt 0 ]; then
         echo "$warning"
     done
     echo ""
-    read -p "Continue? [y/N] " -n 1 -r
-    echo ""
+    read -p "Continue? [y/N] " -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo "Aborted."
         exit 1
@@ -52,15 +51,25 @@ cp "$SCRIPT_DIR/server-setup.sh" "$DEPLOY_DIR/"
 cp "$SCRIPT_DIR/deploy-init.sh" "$DEPLOY_DIR/"
 cp "$SCRIPT_DIR/deploy.sh" "$DEPLOY_DIR/"
 cp "$SCRIPT_DIR/deploy-if-changed.sh" "$DEPLOY_DIR/"
+cp "$SCRIPT_DIR/get-status.sh" "$DEPLOY_DIR/"
+cp "$SCRIPT_DIR/deploy-purge.sh" "$DEPLOY_DIR/"
 cp "$SCRIPT_DIR/docker-compose.yml" "$DEPLOY_DIR/"
+cp "$SCRIPT_DIR/traefik-dynamic.yml" "$DEPLOY_DIR/"
 cp "$SCRIPT_DIR/.env.example" "$DEPLOY_DIR/"
-chmod +x "$DEPLOY_DIR/server-setup.sh" "$DEPLOY_DIR/deploy-init.sh" "$DEPLOY_DIR/deploy.sh" "$DEPLOY_DIR/deploy-if-changed.sh"
+cp "$SCRIPT_DIR/README.md" "$DEPLOY_DIR/"
+mkdir -p "$DEPLOY_DIR/certs"
+chmod +x "$DEPLOY_DIR/server-setup.sh" "$DEPLOY_DIR/deploy-init.sh" "$DEPLOY_DIR/deploy.sh" "$DEPLOY_DIR/deploy-if-changed.sh" "$DEPLOY_DIR/get-status.sh" "$DEPLOY_DIR/deploy-purge.sh"
 echo "  Created deploy/linux-server/server-setup.sh"
 echo "  Created deploy/linux-server/deploy-init.sh"
 echo "  Created deploy/linux-server/deploy.sh"
 echo "  Created deploy/linux-server/deploy-if-changed.sh"
+echo "  Created deploy/linux-server/get-status.sh"
+echo "  Created deploy/linux-server/deploy-purge.sh"
 echo "  Created deploy/linux-server/docker-compose.yml"
+echo "  Created deploy/linux-server/traefik-dynamic.yml"
+echo "  Created deploy/linux-server/certs/ (place TLS certs here)"
 echo "  Created deploy/linux-server/.env.example"
+echo "  Created deploy/linux-server/README.md"
 
 echo ""
 echo "Linux-server deployment added!"

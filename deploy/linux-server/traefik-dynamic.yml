@@ -1,0 +1,7 @@
+# Traefik dynamic configuration for TLS certificates
+# This file is loaded by Traefik's file provider
+
+tls:
+  certificates:
+    - certFile: /etc/traefik/certs/cert.pem
+      keyFile: /etc/traefik/certs/key.pem

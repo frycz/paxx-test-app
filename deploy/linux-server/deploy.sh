@@ -76,7 +76,7 @@ fi
 log_info "Starting $NEW_CONTAINER..."
 
 # Read database URL from environment or construct it
-DB_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/paxx_test_app}
+DB_URL=${DATABASE_URL:-postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/paxx_test_app}
 
 docker run -d \
     --name "$NEW_CONTAINER" \
@@ -87,14 +87,17 @@ docker run -d \
     --label "traefik.enable=true" \
     --label "traefik.http.routers.${NEW_CONTAINER}.rule=PathPrefix(\`/\`)" \
     --label "traefik.http.routers.${NEW_CONTAINER}.entrypoints=web" \
+    --label "traefik.http.routers.${NEW_CONTAINER}-secure.rule=PathPrefix(\`/\`)" \
+    --label "traefik.http.routers.${NEW_CONTAINER}-secure.entrypoints=websecure" \
+    --label "traefik.http.routers.${NEW_CONTAINER}-secure.tls=true" \
     --label "traefik.http.services.${NEW_CONTAINER}.loadbalancer.server.port=8000" \
     --label "traefik.http.services.${NEW_CONTAINER}.loadbalancer.healthcheck.path=/health" \
     --label "traefik.http.services.${NEW_CONTAINER}.loadbalancer.healthcheck.interval=5s" \
     --label "traefik.http.services.${NEW_CONTAINER}.loadbalancer.healthcheck.timeout=3s" \
     "$IMAGE"
 
-# Also connect to internal network for database access
-docker network connect internal "$NEW_CONTAINER" 2>/dev/null || true
+# Also connect to backend network for database access
+docker network connect backend "$NEW_CONTAINER" 2>/dev/null || true
 
 # 5. Wait for health check (uses Docker's built-in HEALTHCHECK from Dockerfile)
 log_info "Waiting for $NEW_CONTAINER to be healthy (timeout: ${HEALTH_TIMEOUT}s)..."
