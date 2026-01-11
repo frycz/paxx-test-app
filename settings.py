@@ -7,7 +7,7 @@ All settings are validated at startup.
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -55,13 +55,15 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
-    @field_validator("secret_key")
-    @classmethod
-    def validate_secret_key(cls, v: str, info) -> str:
-        """Warn if using default secret key in non-development environment."""
-        # Note: In production, this should raise an error instead of just warning
-        # For now, we just ensure minimum length
-        return v
+    @model_validator(mode="after")
+    def validate_secret_key_in_production(self) -> "Settings":
+        """Enforce secure secret key in production."""
+        if self.environment == "production" and "CHANGE-ME" in self.secret_key:
+            raise ValueError(
+                "SECRET_KEY must be set to a secure value in production. "
+                "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(32))\""
+            )
+        return self
 
     @property
     def is_development(self) -> bool:

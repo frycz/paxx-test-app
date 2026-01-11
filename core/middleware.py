@@ -53,6 +53,32 @@ async def timing_middleware(
     return response
 
 
+async def security_headers_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Add security headers to all responses.
+
+    Headers added:
+    - X-Content-Type-Options: nosniff - Prevents MIME type sniffing
+    - X-Frame-Options: DENY - Prevents clickjacking via iframes
+    - X-XSS-Protection: 1; mode=block - Legacy XSS filter (for older browsers)
+    - Strict-Transport-Security - Forces HTTPS (only added on HTTPS requests)
+    """
+    response = await call_next(request)
+
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+
+    # Only add HSTS on HTTPS connections (browsers remember this)
+    if request.url.scheme == "https":
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
+
+    return response
+
+
 def register_middleware(app: FastAPI) -> None:
     """Register custom middleware with the FastAPI app.
 
@@ -64,6 +90,9 @@ def register_middleware(app: FastAPI) -> None:
     """
     # Add timing middleware (runs last, measures total time)
     app.middleware("http")(timing_middleware)
+
+    # Add security headers middleware
+    app.middleware("http")(security_headers_middleware)
 
     # Add request ID middleware (runs first)
     app.middleware("http")(request_id_middleware)

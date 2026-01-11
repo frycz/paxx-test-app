@@ -6,6 +6,7 @@ This module provides the application factory and FastAPI app instance.
 import sys
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from features.auth.routes import router as auth_router
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -83,6 +84,8 @@ def create_app() -> FastAPI:
 
     # Register routers
     app.include_router(health_router, tags=["health"])
+
+    app.include_router(auth_router, prefix="/auth", tags=['auth'])
 
     return app
 

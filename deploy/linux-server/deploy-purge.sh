@@ -87,7 +87,7 @@ declare -a SYSTEM_FOUND=()
 
 # Check containers (compose adds -1 suffix, blue/green are named explicitly)
 for container in "${APP_NAME}-traefik-1" "${APP_NAME}-db-1" "${APP_NAME}-blue" "${APP_NAME}-green"; do
-    if docker ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${container}$"; then
+    if docker inspect "$container" &>/dev/null; then
         CONTAINERS_FOUND+=("$container")
     fi
 done
@@ -261,7 +261,7 @@ echo ""
 if [ ${#CONTAINERS_FOUND[@]} -gt 0 ]; then
     log_comment "# Stop and remove containers"
     for container in "${CONTAINERS_FOUND[@]}"; do
-        echo "docker stop $container && docker rm $container"
+        echo "docker stop $container; docker rm -f $container"
     done
     echo ""
 fi
@@ -395,7 +395,8 @@ ERRORS=0
 if [ ${#CONTAINERS_FOUND[@]} -gt 0 ]; then
     log_info "Stopping and removing containers..."
     for container in "${CONTAINERS_FOUND[@]}"; do
-        if docker stop "$container" 2>/dev/null && docker rm "$container" 2>/dev/null; then
+        docker stop "$container" 2>/dev/null || true
+        if docker rm -f "$container" 2>/dev/null; then
             log_info "  Removed: $container"
         else
             log_warn "  Failed to remove: $container"

@@ -66,10 +66,17 @@ OLD_CONTAINER="${APP_NAME}-${OLD_SLOT}"
 log_info "Current: ${CURRENT_CONTAINER:-none}, deploying to: $NEW_CONTAINER"
 
 # 3. Stop any existing container with the new slot name (cleanup from failed deploy)
-if docker ps -a --format "{{.Names}}" | grep -q "^${NEW_CONTAINER}$"; then
+if docker inspect "$NEW_CONTAINER" &>/dev/null; then
     log_warn "Removing existing $NEW_CONTAINER (leftover from previous deploy)"
     docker stop "$NEW_CONTAINER" 2>/dev/null || true
-    docker rm "$NEW_CONTAINER" 2>/dev/null || true
+    docker rm -f "$NEW_CONTAINER" 2>/dev/null || true
+
+    # Verify container is actually removed
+    if docker inspect "$NEW_CONTAINER" &>/dev/null; then
+        log_error "Failed to remove existing container $NEW_CONTAINER"
+        log_error "Please remove it manually: docker rm -f $NEW_CONTAINER"
+        exit 1
+    fi
 fi
 
 # 4. Start new container

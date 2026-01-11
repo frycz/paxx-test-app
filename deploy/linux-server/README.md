@@ -4,15 +4,7 @@ Deploy paxx-test-app to any Linux server (Debian, Ubuntu, Raspbian) with zero-do
 
 ## Quick Start
 
-### 1. Activate deployment
-
-```bash
-paxx deploy add linux-server
-```
-
-This copies deployment files to `deploy/linux-server/` and creates `.github/workflows/build.yml`.
-
-### 2. Configure environment
+### 1. Configure environment
 
 Create and edit `.env` file:
 
@@ -20,7 +12,7 @@ Create and edit `.env` file:
 cp deploy/linux-server/.env.example deploy/linux-server/.env
 ```
 
-### 3. Setup TLS certificates (optional but recommended)
+### 2. Setup TLS certificates (optional but recommended)
 
 For trusted HTTPS on local networks, use [mkcert](https://github.com/FiloSottile/mkcert) to create locally-trusted certificates.
 
@@ -58,7 +50,7 @@ Replace `YOUR_SERVER_IP` with your server's IP (e.g., `192.168.1.100`).
 
 Without certificates, HTTPS still works but browsers will show a security warning.
 
-### 4. Prepare server environment
+### 3. Prepare server environment
 
 ```bash
 ./deploy/linux-server/deploy-init.sh user@your-server
@@ -66,7 +58,7 @@ Without certificates, HTTPS still works but browsers will show a security warnin
 
 This runs server setup (Docker, firewall, cron), starts Traefik + PostgreSQL, and enables auto-deploy.
 
-### 5. Build and push image
+### 4. Build and push image
 
 ```bash
 git add -A && git commit -m "Add deployment"
