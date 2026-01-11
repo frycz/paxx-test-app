@@ -2,7 +2,23 @@
 
 AWS Cognito authentication feature providing user registration, login, password reset, and JWT validation.
 
-## Required Dependencies
+## Quick Setup
+
+Run the setup script to automatically configure dependencies, settings, and environment variables:
+
+```bash
+python features/auth/setup.py
+```
+
+Then configure your AWS Cognito credentials in `.env` and follow the AWS Cognito Setup section below.
+
+---
+
+## Manual Setup
+
+If you prefer to set up manually, follow the steps below.
+
+### Required Dependencies
 
 Add these to your `pyproject.toml`:
 
@@ -21,7 +37,7 @@ Then run:
 uv sync
 ```
 
-## Required Settings
+### Required Settings
 
 Add these fields to your `settings.py`:
 
@@ -36,7 +52,7 @@ class Settings(BaseSettings):
     cognito_region: str = "us-east-1"
 ```
 
-## Environment Variables
+### Environment Variables
 
 Add to your `.env` file:
 
