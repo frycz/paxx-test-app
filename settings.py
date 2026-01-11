@@ -55,6 +55,13 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
+
+    # Cognito Auth
+    cognito_user_pool_id: str
+    cognito_client_id: str
+    cognito_client_secret: str
+    cognito_region: str = "us-east-1"
+
     @model_validator(mode="after")
     def validate_secret_key_in_production(self) -> "Settings":
         """Enforce secure secret key in production."""

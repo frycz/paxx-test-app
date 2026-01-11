@@ -27,13 +27,9 @@ def get_project_root() -> Path:
 
 def add_dependencies(project_root: Path) -> bool:
     """Add auth dependencies to pyproject.toml."""
-    import tomllib
-
-    import tomli_w
-
     pyproject_path = project_root / "pyproject.toml"
     if not pyproject_path.exists():
-        print("Warning: pyproject.toml not found")
+        print("  Warning: pyproject.toml not found")
         return False
 
     deps_to_add = [
@@ -43,31 +39,58 @@ def add_dependencies(project_root: Path) -> bool:
         "email-validator>=2.3.0",
     ]
 
-    with open(pyproject_path, "rb") as f:
-        pyproject = tomllib.load(f)
+    content = pyproject_path.read_text()
 
-    current = pyproject.get("project", {}).get("dependencies", [])
-
+    # Check which deps already exist
     added = []
     for dep in deps_to_add:
         dep_name = dep.split(">=")[0].split("==")[0].split("<")[0].split("[")[0].strip()
-        existing_names = [
-            d.split(">=")[0].split("==")[0].split("<")[0].split("[")[0].strip()
-            for d in current
-        ]
-        if dep_name not in existing_names:
-            current.append(dep)
+        if f'"{dep_name}' not in content and f"'{dep_name}" not in content:
             added.append(dep)
 
-    if added:
-        pyproject["project"]["dependencies"] = current
-        with open(pyproject_path, "wb") as f:
-            tomli_w.dump(pyproject, f)
-        print(f"  Added to pyproject.toml: {', '.join(added)}")
-        return True
-    else:
+    if not added:
         print("  Dependencies already in pyproject.toml")
         return False
+
+    # Find dependencies array by tracking bracket depth
+    lines = content.split("\n")
+    in_deps = False
+    bracket_depth = 0
+    insert_line = None
+
+    for i, line in enumerate(lines):
+        if "dependencies" in line and "=" in line and "[" in line:
+            in_deps = True
+            bracket_depth = line.count("[") - line.count("]")
+            if bracket_depth == 0:
+                # Single line array - need different handling
+                insert_line = i
+                break
+            continue
+
+        if in_deps:
+            bracket_depth += line.count("[") - line.count("]")
+            if bracket_depth <= 0:
+                insert_line = i
+                break
+
+    if insert_line is None:
+        print("  Warning: Could not find dependencies array in pyproject.toml")
+        return False
+
+    # Add comma to previous line if needed
+    prev_line = lines[insert_line - 1].rstrip()
+    if prev_line and not prev_line.endswith(",") and not prev_line.endswith("["):
+        lines[insert_line - 1] = prev_line + ","
+
+    # Insert new dependencies before the closing bracket
+    new_deps = [f'    "{dep}",' for dep in added]
+    for j, dep_line in enumerate(new_deps):
+        lines.insert(insert_line + j, dep_line)
+
+    pyproject_path.write_text("\n".join(lines))
+    print(f"  Added to pyproject.toml: {', '.join(added)}")
+    return True
 
 
 def run_uv_sync(project_root: Path) -> None:
