@@ -1,10 +1,10 @@
-"""Auth feature API routes."""
+"""AWS Cognito auth feature API routes."""
 
 from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from features.auth.dependencies import get_current_user
-from features.auth.schemas import (
+from features.auth_aws_cognito.dependencies import get_current_user
+from features.auth_aws_cognito.schemas import (
     ChangePasswordRequest,
     ChangePasswordResponse,
     ConfirmForgotPasswordRequest,
@@ -27,7 +27,7 @@ from features.auth.schemas import (
     TokenResponse,
     UserResponse,
 )
-from features.auth.services import cognito_service
+from features.auth_aws_cognito.services import cognito_service
 
 router = APIRouter()
 

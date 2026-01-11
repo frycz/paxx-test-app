@@ -1,4 +1,4 @@
-"""Auth feature services - AWS Cognito operations."""
+"""AWS Cognito auth feature services - Cognito API operations."""
 
 import base64
 import hashlib

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Setup script for the auth feature.
+"""Setup script for the AWS Cognito auth feature.
 
-Run this after adding the auth feature to configure dependencies,
+Run this after adding the auth_aws_cognito feature to configure dependencies,
 settings, and environment variables.
 
 Usage:
-    python features/auth/setup.py
+    python features/auth_aws_cognito/setup.py
 """
 
 import ast
@@ -226,8 +226,8 @@ def update_env_file(project_root: Path, filename: str) -> None:
 
 
 def main() -> None:
-    """Run the auth feature setup."""
-    print("Setting up auth feature...")
+    """Run the AWS Cognito auth feature setup."""
+    print("Setting up AWS Cognito auth feature...")
     print()
 
     project_root = get_project_root()
@@ -249,7 +249,7 @@ def main() -> None:
     update_env_file(project_root, ".env.example")
 
     print()
-    print("Auth feature setup complete!")
+    print("AWS Cognito auth feature setup complete!")
     print()
     print("Next steps:")
     print("  1. Configure your AWS Cognito credentials in .env")

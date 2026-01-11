@@ -1,4 +1,4 @@
-"""Auth feature schemas."""
+"""AWS Cognito auth feature schemas."""
 
 from pydantic import BaseModel, EmailStr
 

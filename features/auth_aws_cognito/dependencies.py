@@ -1,4 +1,4 @@
-"""Auth feature dependencies - JWT validation for protected routes."""
+"""AWS Cognito auth feature dependencies - JWT validation for protected routes."""
 
 import httpx
 from fastapi import Depends, HTTPException, status

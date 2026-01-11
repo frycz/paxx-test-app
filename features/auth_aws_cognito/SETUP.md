@@ -1,4 +1,4 @@
-# Auth Feature Setup
+# AWS Cognito Auth Feature Setup
 
 AWS Cognito authentication feature providing user registration, login, password reset, and JWT validation.
 
@@ -7,7 +7,7 @@ AWS Cognito authentication feature providing user registration, login, password 
 Run the setup script to automatically configure dependencies, settings, and environment variables:
 
 ```bash
-python features/auth/setup.py
+python features/auth_aws_cognito/setup.py
 ```
 
 Then configure your AWS Cognito credentials in `.env` and follow the AWS Cognito Setup section below.
@@ -93,7 +93,7 @@ Use the `get_current_user` dependency to protect routes:
 
 ```python
 from fastapi import Depends
-from features.auth.dependencies import get_current_user
+from features.auth_aws_cognito.dependencies import get_current_user
 
 @router.get("/protected")
 async def protected_route(user: dict = Depends(get_current_user)):

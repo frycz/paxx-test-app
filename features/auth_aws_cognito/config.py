@@ -1,4 +1,4 @@
-"""Auth feature configuration."""
+"""AWS Cognito auth feature configuration."""
 
 from dataclasses import dataclass, field
 
@@ -15,8 +15,8 @@ class AuthFeatureConfig:
         tags: OpenAPI tags for the feature's routes.
     """
 
-    name: str = "auth"
-    verbose_name: str = "Authentication"
+    name: str = "auth_aws_cognito"
+    verbose_name: str = "Authentication (AWS Cognito)"
     description: str = "AWS Cognito user authentication and management"
     prefix: str = "/auth"
     tags: list[str] = field(default_factory=lambda: ["auth"])
